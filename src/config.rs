@@ -1,4 +1,21 @@
-use std::time::Duration;
+use std::{fmt::Debug, time::Duration};
+
+use once_cell::sync::Lazy;
+
+use crate::types::Credentials;
+use crate::{util, VERSION};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum AuthVersion {
+    V1,
+    V2,
+}
+
+impl Default for AuthVersion {
+    fn default() -> Self {
+        AuthVersion::V1
+    }
+}
 
 #[derive(Debug)]
 pub(crate) struct HttpTimeout {
@@ -31,7 +48,7 @@ pub(crate) struct ClientConfig {
     pub(crate) ua: String,
     pub(crate) debug: bool,
     pub(crate) timeout: Duration,
-    pub(crate) security_token: Option<String>,
+    pub(crate) security_token: String,
     pub(crate) cname: bool,
     pub(crate) http_timeout: Option<HttpTimeout>,
     pub(crate) http_max_conns: Option<HttpMaxConns>,
@@ -41,17 +58,36 @@ pub(crate) struct ClientConfig {
     pub(crate) enable_crc: bool,
     pub(crate) log_level: i8,
     pub(crate) upload_limit_speed: i64,
+    pub(crate) credentials_provider: Option<Box<dyn Credentials>>,
     //...
+    pub(crate) additional_headers: Vec<String>,
+    pub(crate) auth_version: AuthVersion,
 }
+
+static DEFAULT_USER_AGENT: Lazy<String> = Lazy::new(|| {
+    let os = util::SYS_INFO.name();
+    let arch = util::SYS_INFO.machine();
+    let release = util::SYS_INFO.release();
+    let rust_ver = rustc_version_runtime::version().to_string();
+
+    format!(
+        "aliyun-sdk-rust/{} ({}/{}/{};{})",
+        VERSION, os, release, arch, rust_ver
+    )
+});
 
 impl Default for ClientConfig {
     fn default() -> Self {
+        let ua = DEFAULT_USER_AGENT.clone();
+
+        info!("get default user-agent: {}", ua);
+
         Self {
             endpoint: Default::default(),
             access_key_id: Default::default(),
             access_key_secret: Default::default(),
             retries: Default::default(),
-            ua: Default::default(),
+            ua: ua,
             debug: Default::default(),
             timeout: Default::default(),
             security_token: Default::default(),
@@ -64,6 +100,32 @@ impl Default for ClientConfig {
             enable_crc: Default::default(),
             log_level: Default::default(),
             upload_limit_speed: Default::default(),
+            credentials_provider: Default::default(),
+            additional_headers: Default::default(),
+            auth_version: Default::default(),
+        }
+    }
+}
+
+impl Credentials for ClientConfig {
+    fn access_key_id(&self) -> &str {
+        match &self.credentials_provider {
+            Some(it) => it.access_key_id(),
+            None => &self.access_key_id,
+        }
+    }
+
+    fn access_key_secret(&self) -> &str {
+        match &self.credentials_provider {
+            Some(it) => it.access_key_secret(),
+            None => &self.access_key_secret,
+        }
+    }
+
+    fn security_token(&self) -> &str {
+        match &self.credentials_provider {
+            Some(it) => it.security_token(),
+            None => &self.security_token,
         }
     }
 }

@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![allow(unreachable_code)]
 #![allow(clippy::type_complexity)]
 #![allow(clippy::field_reassign_with_default)]
 #![allow(clippy::upper_case_acronyms)]
@@ -20,24 +21,11 @@ mod client;
 mod config;
 mod conn;
 mod error;
-mod prelude;
 mod request;
+mod types;
+mod util;
+mod version;
 
-#[cfg(test)]
-mod test_oss {
-    use crate::prelude::*;
-
-    #[tokio::test]
-    async fn test_api_style() {
-        let cli = Client::builder()
-            .endpoint("http://fake.endpoint.com")
-            .access_key("fake_access_key")
-            .access_secret("fake_access_secret")
-            .build()
-            .unwrap();
-        let bucket = cli.bucket("fake_bucket").unwrap();
-        let data = bucket.get_object("foobar.txt").await.unwrap();
-
-        assert!(!data.is_empty());
-    }
-}
+pub use bucket::Bucket;
+pub use client::Client;
+pub use version::VERSION;

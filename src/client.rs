@@ -1,18 +1,14 @@
-use std::net::Ipv4Addr;
 use std::sync::Arc;
-use std::time::Duration;
-
-use reqwest::Url;
 
 use crate::config::ClientConfig;
 use crate::conn::{Conn, UrlMaker};
-use crate::request;
+use crate::util;
 use crate::{bucket::Bucket, Result};
 
 #[derive(Clone)]
 pub struct Client {
-    config: Arc<ClientConfig>,
-    conn: Conn,
+    pub(crate) config: Arc<ClientConfig>,
+    pub(crate) conn: Conn,
     client: reqwest::Client,
 }
 
@@ -44,8 +40,9 @@ impl Client {
     }
 
     pub fn bucket(&self, bucket: impl Into<String>) -> Result<Bucket> {
-        // TODO: validate bucket name
-        Ok(Bucket::new(self.clone(), bucket.into()))
+        let bucket: String = bucket.into();
+        util::check_bucket_name(&bucket)?;
+        Ok(Bucket::new(self.clone(), bucket))
     }
 }
 
