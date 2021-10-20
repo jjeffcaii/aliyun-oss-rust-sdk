@@ -1,9 +1,9 @@
 [package]
-name = "aliyun_oss_rust_sdk"
+name = "yunoss"
 version = "0.0.1-alpha1"
 edition = "2018"
 authors = ["Jeffsky <jjeffcaii@outlook.com>"]
-description = "An unoffical aliyun oss SDK"
+description = "An unoffical Aliyun OSS SDK"
 keywords = ["aliyun", "oss"]
 categories = ["network-programming"]
 readme = "README.md"
@@ -41,3 +41,7 @@ pretty_env_logger = "0.4"
 version = "1.0.3"
 default-features = false
 features = [ "rt", "rt-multi-thread", "net", "sync", "io-util", "macros", "time", "signal" ]
+
+[[example]]
+name = "simple"
+path = "examples/simple.rs"

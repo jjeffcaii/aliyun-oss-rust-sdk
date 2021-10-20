@@ -1,20 +1,12 @@
-# Aliyun OSS Rust SDK
-
-An unoffical Alibaba Cloud OSS SDK for Rust.
-
-**Still in working progress!**
-
-## Example
-
-```rust
+use anyhow::Result;
 use yunoss::Client;
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> Result<()> {
     let cli = Client::builder()
-        .endpoint("your.endpoint.com")
         .access_key("your_access_key")
         .access_secret("your_access_secret")
+        .endpoint("your.endpoint.com")
         .build()?;
 
     let b = cli
@@ -26,4 +18,3 @@ async fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
-```

@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate log;
 
-use aliyun_oss_rust_sdk::Client;
+use yunoss::Client;
 
 fn init() {
     pretty_env_logger::try_init_timed().ok();
