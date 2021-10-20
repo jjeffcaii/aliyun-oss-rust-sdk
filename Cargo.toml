@@ -1,9 +1,15 @@
 [package]
 name = "aliyun_oss_rust_sdk"
-version = "0.0.1"
+version = "0.0.1-alpha1"
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Jeffsky <jjeffcaii@outlook.com>"]
+description = "An unoffical aliyun oss SDK"
+keywords = ["aliyun", "oss"]
+categories = ["network-programming"]
+readme = "README.md"
+homepage = "https://github.com/jjeffcaii/aliyun-oss-rust-sdk"
+repository = "https://github.com/jjeffcaii/aliyun-oss-rust-sdk"
+license = "Apache-2.0"
 
 [dependencies]
 log = "0.4"
