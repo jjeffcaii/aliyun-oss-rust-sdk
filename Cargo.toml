@@ -1,6 +1,6 @@
 [package]
 name = "yunoss"
-version = "0.0.1-alpha2"
+version = "0.0.1-alpha3"
 edition = "2018"
 authors = ["Jeffsky <jjeffcaii@outlook.com>"]
 description = "An unoffical Aliyun OSS SDK"
