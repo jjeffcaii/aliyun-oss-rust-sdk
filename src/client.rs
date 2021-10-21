@@ -20,7 +20,10 @@ impl Client {
     }
 
     fn new(config: ClientConfig) -> Result<Client> {
-        let client = reqwest::Client::builder().timeout(config.timeout).build()?;
+        let client = reqwest::Client::builder()
+            .http1_only()
+            .timeout(config.timeout)
+            .build()?;
         /*
         reqwest::Client::builder()
                 .connect_timeout(Duration::from_secs(3))

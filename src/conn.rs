@@ -190,15 +190,13 @@ impl Conn {
         self.sign_header(&mut req, resource);
 
         let resp = req.send(&self.client).await?;
+        let status_code = resp.status().as_u16();
+        let is_success = resp.status().is_success();
+        let b = resp.bytes().await?.to_vec();
 
-        if resp.status().is_success() {
-            let b = resp.bytes().await?;
-            let b = b.to_vec();
+        if is_success {
             Ok(b)
         } else {
-            let status_code = resp.status().as_u16();
-            let b = resp.bytes().await?;
-            let b = b.to_vec();
             if let Ok(e) = ServiceError::try_from_xml(&b) {
                 Err(OSSError::ServiceError(status_code, e.code, e.message, e.request_id).into())
             } else {

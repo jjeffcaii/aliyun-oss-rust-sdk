@@ -31,7 +31,11 @@ impl Request {
             req = req.header(&k, &v);
         }
 
-        Ok(req.body(body).send().await?)
+        if !body.is_empty() {
+            req = req.body(body);
+        }
+
+        Ok(req.send().await?)
     }
 }
 

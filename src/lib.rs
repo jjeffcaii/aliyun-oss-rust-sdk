@@ -21,7 +21,6 @@ mod client;
 mod config;
 mod conn;
 mod error;
-mod request;
 mod types;
 mod util;
 mod version;
