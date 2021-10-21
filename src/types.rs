@@ -28,14 +28,14 @@ impl Request {
 
         let mut req = client.request(method, url);
         for (k, v) in headers {
-            req = req.header(k, v);
+            req = req.header(&k, &v);
         }
 
         Ok(req.body(body).send().await?)
     }
 }
 
-pub(crate) trait Credentials {
+pub(crate) trait Credentials: Send + Sync {
     fn access_key_id(&self) -> &str;
     fn access_key_secret(&self) -> &str;
     fn security_token(&self) -> &str;

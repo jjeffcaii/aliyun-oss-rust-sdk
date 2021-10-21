@@ -329,7 +329,7 @@ impl Conn {
             }
         };
 
-        info!("sign: before={}, after={}", sign_str, sign);
+        // debug!("sign: before={}, after={}", sign_str, sign);
 
         sign
     }

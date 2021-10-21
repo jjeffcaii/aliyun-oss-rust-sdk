@@ -89,7 +89,7 @@ impl Default for ClientConfig {
             retries: Default::default(),
             ua: ua,
             debug: Default::default(),
-            timeout: Default::default(),
+            timeout: Duration::from_secs(60),
             security_token: Default::default(),
             cname: Default::default(),
             http_timeout: Default::default(),
