@@ -4,10 +4,9 @@ use std::fmt::Write;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 
-use crypto::hmac::Hmac;
-use crypto::mac::Mac;
-use crypto::sha1::Sha1;
-use crypto::sha2::Sha256;
+use sha1::Sha1;
+use sha2::Sha256;
+use hmac::{Hmac, Mac, NewMac};
 use once_cell::sync::Lazy;
 use reqwest::Url;
 
@@ -16,6 +15,9 @@ use crate::error::{OSSError, ServiceError};
 use crate::types::{Credentials, Headers, Params, Request};
 use crate::util;
 use crate::Result;
+
+type HmacSha1 = Hmac<Sha1>;
+type HmacSha256 = Hmac<Sha256>;
 
 static SIGN_KEYS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
     let v = vec![
@@ -303,10 +305,11 @@ impl Conn {
         let sign = match self.config.auth_version {
             AuthVersion::V1 => {
                 sign_str.push_str(resource);
-                let mut mac = Hmac::new(Sha1::new(), key_secret.as_bytes());
-                mac.input(sign_str.as_bytes());
-                let res = mac.result();
-                let code = res.code();
+                let mut mac = HmacSha1::new_from_slice(key_secret.as_bytes())
+                    .expect("HMAC can take key of any size");
+                mac.update(sign_str.as_bytes());
+                let res = mac.finalize();
+                let code = res.into_bytes();
                 base64::encode(code)
             }
             AuthVersion::V2 => {
@@ -319,10 +322,11 @@ impl Conn {
                 sign_str.push('\n');
                 sign_str.push_str(resource);
 
-                let mut mac = Hmac::new(Sha256::new(), key_secret.as_bytes());
-                mac.input(sign_str.as_bytes());
-                let res = mac.result();
-                let code = res.code();
+                let mut mac = HmacSha256::new_from_slice(key_secret.as_bytes())
+                    .expect("HMAC can take key of any size");
+                mac.update(sign_str.as_bytes());
+                let res = mac.finalize();
+                let code = res.into_bytes();
                 base64::encode(code)
             }
         };
