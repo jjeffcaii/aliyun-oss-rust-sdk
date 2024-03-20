@@ -4,11 +4,12 @@ use std::fmt::Write;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 
-use sha1::Sha1;
-use sha2::Sha256;
-use hmac::{Hmac, Mac, NewMac};
+use base64::{engine::general_purpose::STANDARD, Engine as _};
+use hmac::{Hmac, Mac};
 use once_cell::sync::Lazy;
 use reqwest::Url;
+use sha1::Sha1;
+use sha2::Sha256;
 
 use crate::config::{AuthVersion, ClientConfig};
 use crate::error::{OSSError, ServiceError};
@@ -198,12 +199,10 @@ impl Conn {
 
         if is_success {
             Ok(b)
+        } else if let Ok(e) = ServiceError::try_from_xml(&b) {
+            Err(OSSError::ServiceError(status_code, e.code, e.message, e.request_id).into())
         } else {
-            if let Ok(e) = ServiceError::try_from_xml(&b) {
-                Err(OSSError::ServiceError(status_code, e.code, e.message, e.request_id).into())
-            } else {
-                bail!("{}", String::from_utf8_lossy(&b))
-            }
+            bail!("{}", String::from_utf8_lossy(&b))
         }
     }
 
@@ -262,12 +261,10 @@ impl Conn {
 
         for (k, v) in &req.headers {
             let k = k.to_lowercase();
-            if k.starts_with("x-oss-") {
+            if k.starts_with("x-oss-")
+                || (self.config.auth_version == AuthVersion::V2 && additional_keys.contains(&k))
+            {
                 hs.insert(k, v);
-            } else if self.config.auth_version == AuthVersion::V2 {
-                if additional_keys.contains(&k) {
-                    hs.insert(k, v);
-                }
             }
         }
 
@@ -310,7 +307,7 @@ impl Conn {
                 mac.update(sign_str.as_bytes());
                 let res = mac.finalize();
                 let code = res.into_bytes();
-                base64::encode(code)
+                STANDARD.encode(code)
             }
             AuthVersion::V2 => {
                 for (i, v) in additional_keys.iter().enumerate() {
@@ -327,7 +324,7 @@ impl Conn {
                 mac.update(sign_str.as_bytes());
                 let res = mac.finalize();
                 let code = res.into_bytes();
-                base64::encode(code)
+                STANDARD.encode(code)
             }
         };
 
@@ -384,7 +381,7 @@ impl Conn {
 
     fn get_url_params(params: &Params) -> Result<String> {
         let s = serde_urlencoded::to_string(params)?;
-        Ok(s.replace("+", "%20"))
+        Ok(s.replace('+', "%20"))
     }
 
     fn get_sub_resource(&self, params: &Params) -> Result<String> {

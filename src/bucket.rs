@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::client::Client;
 use crate::util;
 use crate::Result;
@@ -20,9 +18,8 @@ impl Bucket {
         self.do_request(reqwest::Method::GET, object).await
     }
 
+    #[inline]
     async fn do_request(&self, method: reqwest::Method, object: &str) -> Result<Vec<u8>> {
-        // self.client
-        let headers = HashMap::<String, String>::new();
         util::check_bucket_name(&self.name)?;
 
         self.client

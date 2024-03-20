@@ -54,7 +54,8 @@ pub(crate) struct ClientConfig {
     pub(crate) http_max_conns: Option<HttpMaxConns>,
     pub(crate) http_proxy: Option<HttpProxy>,
     pub(crate) enable_md5: bool,
-    pub(crate) md5_threshold: i64, // bytes
+    pub(crate) md5_threshold: i64,
+    // bytes
     pub(crate) enable_crc: bool,
     pub(crate) log_level: i8,
     pub(crate) upload_limit_speed: i64,
@@ -87,7 +88,7 @@ impl Default for ClientConfig {
             access_key_id: Default::default(),
             access_key_secret: Default::default(),
             retries: Default::default(),
-            ua: ua,
+            ua,
             debug: Default::default(),
             timeout: Duration::from_secs(60),
             security_token: Default::default(),

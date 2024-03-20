@@ -6,23 +6,23 @@ use crate::Result;
 
 pub(crate) fn check_bucket_name(name: &str) -> Result<()> {
     let len = name.len();
-    if len < 3 || len > 63 {
-        return bail!("bucket name {} len is between [3-63],now is {}", name, &len);
+    if !(3..=63).contains(&len) {
+        bail!("bucket name {} len is between [3-63],now is {}", name, &len);
     }
     for ch in name.chars() {
-        let valid = ('a' <= ch && ch <= 'z') || ('0' <= ch && ch <= '9') || ch == '-';
+        let valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
         if !valid {
-            return bail!(
+            bail!(
                 "bucket name {} can only include lowercase letters, numbers, and -",
                 name
             );
         }
     }
 
-    if name.chars().nth(0).unwrap_or_default() == '-'
+    if name.chars().next().unwrap_or_default() == '-'
         || name.chars().last().unwrap_or_default() == '-'
     {
-        return bail!(
+        bail!(
             "bucket name {} must start and end with a lowercase letter or number",
             name
         );
@@ -32,7 +32,7 @@ pub(crate) fn check_bucket_name(name: &str) -> Result<()> {
 
 pub(crate) fn query_escape(input: &str) -> String {
     let s = serde_urlencoded::to_string(vec![("k", input)]).expect("Convert query escape failed!");
-    s[2..].replace("+", "%20")
+    s[2..].replace('+', "%20")
 }
 
 pub(crate) fn httptime() -> String {

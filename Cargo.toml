@@ -1,7 +1,7 @@
 [package]
 name = "yunoss"
-version = "0.0.1-alpha3"
-edition = "2018"
+version = "0.0.1"
+edition = "2021"
 authors = ["Jeffsky <jjeffcaii@outlook.com>"]
 description = "An unoffical Aliyun OSS SDK"
 keywords = ["aliyun", "oss"]
@@ -16,33 +16,24 @@ log = "0.4"
 thiserror = "1.0"
 anyhow = "1.0"
 once_cell = "1.7"
-
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
 serde_urlencoded = "0.7"
-
 chrono = "0.4"
-
-reqwest = "0.11"
-
-base64 = "0.13"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+rustls = { version = "0.21" }
+base64 = "0.22"
 md5 = "0.7"
-crc = "2.0"
-rustc_version_runtime = "0.2.0"
-
-quick-xml = { version = "0.22", features = [ "serialize" ] }
-sha-1 = "0.9.8"
-sha2 = "0.9.8"
-hmac = "0.11.0"
+crc = "3.0"
+rustc_version_runtime = "0.3"
+quick-xml = { version = "0.31", features = ["serialize"] }
+sha-1 = "0.10"
+sha2 = "0.10"
+hmac = "0.12"
 
 [dev-dependencies]
-pretty_env_logger = "0.4"
-
-[dev-dependencies.tokio]
-version = "1.0.3"
-default-features = false
-features = [ "rt", "rt-multi-thread", "net", "sync", "io-util", "macros", "time", "signal" ]
+pretty_env_logger = "*"
+tokio = { version = "1", default-features = false, features = ["rt", "rt-multi-thread", "net", "sync", "io-util", "macros", "time", "signal"] }
 
 [[example]]
 name = "simple"

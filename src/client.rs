@@ -24,12 +24,6 @@ impl Client {
             .http1_only()
             .timeout(config.timeout)
             .build()?;
-        /*
-        reqwest::Client::builder()
-                .connect_timeout(Duration::from_secs(3))
-                .timeout(Duration::from_secs(3))
-                .build()
-                .unwrap() */
 
         let um = UrlMaker::new(&config.endpoint, config.cname, config.http_proxy.is_some())?;
         let config = Arc::new(config);
